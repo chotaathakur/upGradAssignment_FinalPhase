@@ -1,9 +1,9 @@
-package upGradAssignment_Imdb_FetchSort;
+package Imdb_FetchSort;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.ListIterator;
+import java.math.BigDecimal;
+
 import java.util.NoSuchElementException;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -12,17 +12,19 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
-import upGradAssignent_Imdb_CommonLocators.Imdb_SortingPage_Locators;
+import Imdb_CommonLocators.Imdb_SortingPage_Locators;
+import Imdb_FetchSort.SortBase;
 
 public class SortByMetrics extends FetchMovieInformation {
 
-	public static WebElement DropdownElement;
+	public static WebElement DropdownElement, sortIterator, sortIterator2;
 	public static Select dropdown;
-	public static int rankAtCurrentIndexAsc[] = new int[250];
-	public static int rankAtNextIndexAsc[] = new int[250];
+	public static int rankAtCurrentIndexAsc[] = new int[300];
+	public static int rankAtNextIndexAsc[] = new int[300];
 	public static String sortedMetricStringAscending, sortedMetricStringDescending, stringToAppendPass,
 			stringToAppendFail, stringToAppendPassEven, stringToAppendFailEven;
 
+	// initializing dropdown
 	public static void dropdown() {
 
 		DropdownElement = driver.findElement((By) Imdb_SortingPage_Locators.sortDropdown);
@@ -30,6 +32,7 @@ public class SortByMetrics extends FetchMovieInformation {
 
 	}
 
+	// will write all the stored data in Excel
 	public static void storeReports(String sortMetricsName) throws IOException {
 		String fileName = sortMetricsName;
 		String pathName = "D:/" + fileName + ".xls";
@@ -42,10 +45,12 @@ public class SortByMetrics extends FetchMovieInformation {
 		System.out.println();
 	}
 
+	// will click the "sort" button
 	public static void sortButton() {
 		driver.findElement((By) Imdb_SortingPage_Locators.sortButton).click();
 	}
 
+	// to create an excel sheet with default columns to store sort data
 	public static void createExcelSheet() {
 		workbook = new HSSFWorkbook();
 		sheet = workbook.createSheet("Ascending Rankings");
@@ -55,6 +60,7 @@ public class SortByMetrics extends FetchMovieInformation {
 		rowhead.getCell(0).setCellValue("Ascending Result");
 		setBorder(cell);
 		setColor(cell);
+
 		cell = rowhead.createCell(1);
 		rowhead.getCell(1).setCellValue("Ascending Status");
 		setBorder(cell);
@@ -72,9 +78,18 @@ public class SortByMetrics extends FetchMovieInformation {
 		setBorder(cell2);
 		setColor(cell2);
 
+		sheet3 = workbook.createSheet("Sort Order Maintenance");
+		rowhead3 = sheet3.createRow((short) 0);
+		cell3 = rowhead3.createCell(0);
+		rowhead3.getCell(0).setCellValue("Sort Order Maintenance Result");
+		setBorder(cell3);
+		setColor(cell3);
+
 	}
 
+	//sortByRankings- rank 1 to 250 sort will be verified
 	public static void sortByRankings(String sortOrder) throws InterruptedException {
+			//pre-determined text to display proper print
 		if (sortOrder == "descending") {
 			stringToAppendPass = " is Ranked Lower ";
 			stringToAppendFail = " is Ranked Higher ";
@@ -88,38 +103,44 @@ public class SortByMetrics extends FetchMovieInformation {
 		}
 
 		dropdown.selectByVisibleText("Ranking");
-		List<WebElement> movieRanking = driver.findElements((By) Imdb_SortingPage_Locators.movieRanking);
-		ListIterator<WebElement> itr = movieRanking.listIterator();
+		SortBase.initialiseAllElementsOfSortTable();
 
 		noOfItems = 1;
 
-		while (itr.hasNext() && noOfItems <= 249) {
-			WebElement sortIterator = itr.next();
+		while (SortBase.itr.hasNext() && noOfItems <= 249) {
+			sortIterator = SortBase.itr.next();
+			sortIterator2 = SortBase.itr2.next();
 			if (sortIterator.isDisplayed()) {
-
-				String ranking = sortIterator.findElement((By) Imdb_SortingPage_Locators.movieRankingFetch)
-						.getAttribute("data-value");
-
-				int currentRankingStore = Integer.parseInt(ranking);
-				rankAtCurrentIndexAsc[noOfItems] = currentRankingStore;
+				SortBase.findAndStoreAllElementsOfSortTable();
+				int currentRankingStore = Integer.parseInt(SortBase.ranking);
 				try {
-					sortIterator = itr.next();
+					sortIterator = SortBase.itr.next();
 					String nextElementStorage = sortIterator
 							.findElement((By) Imdb_SortingPage_Locators.movieRankingFetch).getAttribute("data-value");
 					int nextRankingStore = Integer.parseInt(nextElementStorage);
 					rankAtNextIndexAsc[noOfItems] = nextRankingStore;
 					SortBase.sortBase(currentRankingStore, nextRankingStore, sortOrder);
+					SortBase.findFetchedRank();
+					SortBase.compareExistingSorting();
 
 				} catch (NoSuchElementException e) {
-					itr.previous();
+					SortBase.itr.previous();
 				}
 
 			}
 			noOfItems++;
-			itr.previous();
-
+			SortBase.itr.previous();
 		}
+	}
 
+	public static double roundToOneDecimal(double currentImdbRankingScore) {
+		int decimalPlaces = 1;
+		BigDecimal bd = new BigDecimal(currentImdbRankingScore);
+
+		// setScale is immutable
+		bd = bd.setScale(decimalPlaces, BigDecimal.ROUND_HALF_UP);
+		currentImdbRankingScore = bd.doubleValue();
+		return currentImdbRankingScore;
 	}
 
 	public static void sortByIMDbRatings(String sortOrder) throws InterruptedException {
@@ -139,30 +160,29 @@ public class SortByMetrics extends FetchMovieInformation {
 			System.out.println("Sort Descending for IMDbRating will be verified");
 
 		}
-		List<WebElement> movieratings = driver.findElements((By) Imdb_SortingPage_Locators.movieRating);
-		ListIterator<WebElement> itr = movieratings.listIterator();
+		SortBase.initialiseAllElementsOfSortTable();
 
 		noOfItems = 1;
 
-		while (itr.hasNext() && noOfItems <= 250) {
-			WebElement sortIterator = itr.next();
+		while (SortBase.itr.hasNext() && noOfItems <= 249) {
+			sortIterator = SortBase.itr.next();
+			sortIterator2 = SortBase.itr2.next();
 			if (sortIterator.isDisplayed()) {
-
-				String IMDbMovieRatings = sortIterator.findElement((By) Imdb_SortingPage_Locators.movieRatingFetch)
-						.getText();
-
-				float CurrentRatingStore = Float.parseFloat(IMDbMovieRatings);
+				SortBase.findAndStoreAllElementsOfSortTable();
+				float CurrentRatingStore = Float.parseFloat(SortBase.IMDbRating);
 				try {
-					WebElement SortCompare = itr.next();
+					WebElement SortCompare = SortBase.itr.next();
 					String nextElementStorage = SortCompare.findElement((By) Imdb_SortingPage_Locators.movieRatingFetch)
-							.getText();
+							.getAttribute("data-value");
 					float nextRatingStore = Float.parseFloat(nextElementStorage);
 					SortBase.sortBase(CurrentRatingStore, nextRatingStore, sortOrder);
+					SortBase.findFetchedRank();
+					SortBase.compareExistingSorting();
 				} catch (NoSuchElementException e) {
-					itr.previous();
+					SortBase.itr.previous();
 				}
 				noOfItems++;
-				itr.previous();
+				SortBase.itr.previous();
 
 			}
 		}
@@ -182,35 +202,29 @@ public class SortByMetrics extends FetchMovieInformation {
 		}
 
 		dropdown.selectByVisibleText("Number of Ratings");
-
-		List<WebElement> noOfRatings = driver.findElements((By) Imdb_SortingPage_Locators.movieRating);
-		ListIterator<WebElement> itr = noOfRatings.listIterator();
+		SortBase.initialiseAllElementsOfSortTable();
 
 		noOfItems = 1;
 
-		while (itr.hasNext() && noOfItems <= 250) {
-			WebElement sortIterator = itr.next();
+		while (SortBase.itr.hasNext() && noOfItems <= 249) {
+			sortIterator = SortBase.itr.next();
+			sortIterator2 = SortBase.itr2.next();
 			if (sortIterator.isDisplayed()) {
-
-				String TotalRatings = sortIterator.findElement((By) Imdb_SortingPage_Locators.movieRatingFetch)
-						.getAttribute("title");
-
-				TotalRatings = TotalRatings.replaceAll("[^0-9]", "");
-				TotalRatings = TotalRatings.substring(2);
-				int currentNoOfRatingStore = Integer.parseInt(TotalRatings);
+				SortBase.findAndStoreAllElementsOfSortTable();
+				float currentNoOfRatingStore = Float.parseFloat(SortBase.MovieNoOfVotes);
 				try {
-					WebElement SortCompare = itr.next();
-					String nextElementStorage = SortCompare.findElement((By) Imdb_SortingPage_Locators.movieRatingFetch)
-							.getAttribute("title");
-					nextElementStorage = nextElementStorage.replaceAll("[^0-9]", "");
-					nextElementStorage = nextElementStorage.substring(2);
+					WebElement SortCompare = SortBase.itr.next();
+					String nextElementStorage = SortCompare
+							.findElement((By) Imdb_SortingPage_Locators.movieNoOfVotesFetch).getAttribute("data-value");
 					int nextNoOfRatingStore = Integer.parseInt(nextElementStorage);
 					SortBase.sortBase(currentNoOfRatingStore, nextNoOfRatingStore, sortOrder);
+					SortBase.findFetchedRank();
+					SortBase.compareExistingSorting();
 				} catch (NoSuchElementException e) {
-					itr.previous();
+					SortBase.itr.previous();
 				}
 				noOfItems++;
-				itr.previous();
+				SortBase.itr.previous();
 
 			}
 		}
@@ -237,77 +251,89 @@ public class SortByMetrics extends FetchMovieInformation {
 		}
 
 		dropdown.selectByVisibleText("Release Date");
-		List<WebElement> movieReleaseTable = driver.findElements((By) Imdb_SortingPage_Locators.movieTable);
-		ListIterator<WebElement> itr = movieReleaseTable.listIterator();
-
+		SortBase.initialiseAllElementsOfSortTable();
 		noOfItems = 1;
 
-		while (itr.hasNext() && noOfItems <= 250) {
-			WebElement sortIterator = itr.next();
-
+		while (SortBase.itr.hasNext() && noOfItems <= 249) {
+			sortIterator = SortBase.itr.next();
+			sortIterator2 = SortBase.itr2.next();
 			if (sortIterator.isDisplayed()) {
-
-				String releaseDate = sortIterator.findElement((By) Imdb_SortingPage_Locators.movieReleaseFetch)
-						.getText();
-				releaseDate = releaseDate.replaceAll("[^0-9]", "");
-
-				int currentReleaseStore = Integer.parseInt(releaseDate);
+				SortBase.findAndStoreAllElementsOfSortTable();
+				float movieReleaseYear = Float.parseFloat(SortBase.MovieReleaseElement);
 				try {
-					WebElement SortCompare = itr.next();
-					String nextElementStorage = SortCompare
+
+					sortIterator = SortBase.itr.next();
+					sortIterator2 = SortBase.itr2.next();
+					String nextElementStorage = sortIterator2
 							.findElement((By) Imdb_SortingPage_Locators.movieReleaseFetch).getText();
 					nextElementStorage = nextElementStorage.replaceAll("[^0-9]", "");
 
 					int nextReleaseStore = Integer.parseInt(nextElementStorage);
 
-					SortBase.sortBase(currentReleaseStore, nextReleaseStore, sortOrder);
+					SortBase.sortBase(movieReleaseYear, nextReleaseStore, sortOrder);
+					SortBase.findFetchedRank();
 
 				} catch (NoSuchElementException e) {
-					itr.previous();
+					SortBase.itr.previous();
+
 				}
 				noOfItems++;
-				itr.previous();
+				SortBase.itr.previous();
+				SortBase.itr2.previous();
 
 			}
 		}
-
 	}
 
 	public static void main(String args[]) {
-		//driver = LaunchChrome();
+
 		try {
-			launchIMDBTop250Page();
-			dropdown();
-			dropdown.selectByVisibleText("Release Date");
+			SortBase.fetchDefaultSorting();
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		launchIMDBTop250Page();
+		dropdown();
 
-			createExcelSheet();
+		createExcelSheet();
+		try {
 			sortByRankings("ascending");
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
 			sortByRankings("descending");
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
 			storeReports("sortByRankings");
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
-			/*
-			 * createExcelSheet(); sortByReleaseDate("descending");
-			 * sortByReleaseDate("ascending");
-			 * 
-			 * storeReports("sortByReleaseDate");
-			 * 
-			 * createExcelSheet(); sortByIMDbRatings("descending");
-			 * sortByIMDbRatings("ascending");
-			 * 
-			 * storeReports("sortByIMDbRatings");
-			 * 
-			 * createExcelSheet(); sortByNoOfRatings("descending");
-			 * sortByNoOfRatings("ascending");
-			 * 
-			 * storeReports("sortByNoOfRatings");
-			 */
-			System.out.println("Task Complete");
-
+		/*
+		 * createExcelSheet(); sortByReleaseDate("descending");
+		 * sortByReleaseDate("ascending"); storeReports("sortByReleaseDate");
+		 * 
+		 * createExcelSheet(); sortByIMDbRatings("descending");
+		 * sortByIMDbRatings("ascending"); storeReports("sortByIMDbRatings");
+		 * 
+		 * createExcelSheet(); sortByNoOfRatings("descending");
+		 * sortByNoOfRatings("ascending"); storeReports("sortByNoOfRatings");
+		 * 
+		 * System.out.println("Task Complete"); }
+		 */
+		try {
 		} catch (Exception e) {
 			System.out.print("Script Failed");
 			driver.quit();
 		}
 		driver.quit();
-
+		// }
 	}
 }
