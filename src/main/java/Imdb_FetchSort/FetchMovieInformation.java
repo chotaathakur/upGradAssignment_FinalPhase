@@ -149,10 +149,11 @@ public class FetchMovieInformation extends CreateExcel {
 
 				String IMDbMovieRatings = sortIterator.findElement((By) Imdb_SortingPage_Locators.movieRatingFetch)
 						.getAttribute("data-value");
-
+				double IMDbMovieRating=Float.parseFloat(IMDbMovieRatings);
+				IMDbMovieRating = SortBase.roundToOneDecimal(IMDbMovieRating);
 				rowhead = sheet.getRow((short) noOfItems);
 				cell = rowhead.createCell(2);
-				rowhead.getCell(2).setCellValue(IMDbMovieRatings);
+				rowhead.getCell(2).setCellValue(IMDbMovieRating);
 
 				noOfItems++;
 
