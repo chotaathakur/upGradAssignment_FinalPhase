@@ -32,6 +32,8 @@ public class SortBase extends SortByMetrics {
 	public static String availableTestDataDataPath = "resources/testdata/verifySort.xls";
 	public static String ranking, IMDbRating, MovieTitleElement, MovieReleaseElement, MovieNoOfVotes;
 
+	
+	//fetching the reference test data
 	public static void fetchDefaultSorting() throws IOException {
 
 		try {
@@ -66,7 +68,8 @@ public class SortBase extends SortByMetrics {
 			e.printStackTrace();
 		}
 	}
-
+	
+	//finding the rank fetched from the webstie
 	public static void findFetchedRank() {
 		int toFind = (int) fetchedRank[noOfItems];
 		boolean found = false;
@@ -87,7 +90,7 @@ public class SortBase extends SortByMetrics {
 		}
 
 	}
-
+	//verifying whether the existing sorting data is affected or not
 	public static void compareExistingSorting() {
 
 		if (storedTitle[currentFetchedRank].equals(fetchedTitle[noOfItems])
@@ -109,6 +112,8 @@ public class SortBase extends SortByMetrics {
 
 		}
 	}
+	
+	//initialise the table needed to verify sorting
 
 	public static void initialiseAllElementsOfSortTable() {
 		movieRanking = driver.findElements((By) Imdb_SortingPage_Locators.moviePosterColumn);
@@ -116,7 +121,7 @@ public class SortBase extends SortByMetrics {
 		title = driver.findElements((By) Imdb_SortingPage_Locators.movieTableColumn);
 		itr2 = title.listIterator();
 	}
-
+	//find necessary elements from table needed to verify sorting
 	public static void findAndStoreAllElementsOfSortTable() {
 		ranking = sortIterator.findElement((By) Imdb_SortingPage_Locators.movieRankingFetch).getAttribute("data-value");
 
@@ -141,6 +146,7 @@ public class SortBase extends SortByMetrics {
 		rankAtCurrentIndexAsc[noOfItems] = currentRankingStore;
 	}
 
+	//verifying the actual sorting
 	public static void sortBase(float currentMetric, float nextMetric, String sortOrder) throws InterruptedException {
 
 		if (currentMetric < nextMetric && sortOrder == "ascending") {
@@ -169,6 +175,7 @@ public class SortBase extends SortByMetrics {
 		}
 	}
 
+	//checking fail scenario
 	public static void failScenarioAscending(float currentMetricAsc, float nextMetricAsc) {
 
 		rowhead = sheet.createRow((short) noOfItems);
@@ -185,7 +192,7 @@ public class SortBase extends SortByMetrics {
 		sheet.autoSizeColumn(1);
 
 	}
-
+	//checking fail scenario desc
 	public static void failScenarioDescending(float currentMetricDesc, float nextMetricDesc) {
 		rowhead2 = sheet2.createRow((short) noOfItems);
 		cell2 = rowhead2.createCell(0);
@@ -204,7 +211,7 @@ public class SortBase extends SortByMetrics {
 		sheet2.autoSizeColumn(1);
 
 	}
-
+	//checking pass scenario
 	public static void passScenarioAscending(float currentRatingStoreAsc, float nextRatingStoreAsc) {
 		rowhead = sheet.createRow((short) noOfItems);
 		cell = rowhead.createCell(0);
@@ -222,7 +229,7 @@ public class SortBase extends SortByMetrics {
 		sheet.autoSizeColumn(1);
 
 	}
-
+	//checking pass scenario desc
 	public static void passScenarioDescending(float currentRatingStoreDesc, float nextRatingStoreDesc) {
 
 		rowhead2 = sheet2.createRow((short) noOfItems);

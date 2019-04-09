@@ -87,9 +87,9 @@ public class SortByMetrics extends FetchMovieInformation {
 
 	}
 
-	//sortByRankings- rank 1 to 250 sort will be verified
+	// sortByRankings- rank 1 to 250 sort will be verified
 	public static void sortByRankings(String sortOrder) throws InterruptedException {
-			//pre-determined text to display proper print
+		// pre-determined text to display proper print
 		if (sortOrder == "descending") {
 			stringToAppendPass = " is Ranked Lower ";
 			stringToAppendFail = " is Ranked Higher ";
@@ -128,11 +128,32 @@ public class SortByMetrics extends FetchMovieInformation {
 				}
 
 			}
+			switch (noOfItems) {
+			case 50:
+				System.out.println("Verified for 50 Elements");
+
+				break;
+			case 100:
+				System.out.println("Verified for 100 Elements");
+
+				break;
+			case 150:
+				System.out.println("Verified for 150 Elements");
+
+				break;
+			case 200:
+				System.out.println("Verified for 200 Elements");
+
+				break;
+			default:
+				System.out.println("Proceed");
+			}
 			noOfItems++;
 			SortBase.itr.previous();
 		}
 	}
 
+	// round off function to 1 digit, useful for imdb score verification
 	public static double roundToOneDecimal(double currentImdbRankingScore) {
 		int decimalPlaces = 1;
 		BigDecimal bd = new BigDecimal(currentImdbRankingScore);
@@ -143,6 +164,7 @@ public class SortByMetrics extends FetchMovieInformation {
 		return currentImdbRankingScore;
 	}
 
+	// sortByIMDbRatings- all ratings for 1 to 250 sort will be verified
 	public static void sortByIMDbRatings(String sortOrder) throws InterruptedException {
 		dropdown.selectByVisibleText("IMDb Rating");
 		if (sortOrder == "ascending") {
@@ -180,6 +202,26 @@ public class SortByMetrics extends FetchMovieInformation {
 					SortBase.compareExistingSorting();
 				} catch (NoSuchElementException e) {
 					SortBase.itr.previous();
+					switch (noOfItems) {
+					case 50:
+						System.out.println("Verified for 50 Elements");
+
+						break;
+					case 100:
+						System.out.println("Verified for 100 Elements");
+
+						break;
+					case 150:
+						System.out.println("Verified for 150 Elements");
+
+						break;
+					case 200:
+						System.out.println("Verified for 200 Elements");
+
+						break;
+					default:
+						System.out.println("Proceed");
+					}
 				}
 				noOfItems++;
 				SortBase.itr.previous();
@@ -188,6 +230,7 @@ public class SortByMetrics extends FetchMovieInformation {
 		}
 	}
 
+	// sortByNoOfRatings- all ratings for movie 1 to 250 sort will be verified
 	public static void sortByNoOfRatings(String sortOrder) throws InterruptedException {
 		if (sortOrder == "ascending") {
 			stringToAppendPass = " has lesser No. of Ratings ";
@@ -223,6 +266,26 @@ public class SortByMetrics extends FetchMovieInformation {
 				} catch (NoSuchElementException e) {
 					SortBase.itr.previous();
 				}
+				switch (noOfItems) {
+				case 50:
+					System.out.println("Verified for 50 Elements");
+
+					break;
+				case 100:
+					System.out.println("Verified for 100 Elements");
+
+					break;
+				case 150:
+					System.out.println("Verified for 150 Elements");
+
+					break;
+				case 200:
+					System.out.println("Verified for 200 Elements");
+
+					break;
+				default:
+					System.out.println("Proceed");
+				}
 				noOfItems++;
 				SortBase.itr.previous();
 
@@ -231,6 +294,8 @@ public class SortByMetrics extends FetchMovieInformation {
 
 	}
 
+	// sortByReleaseDate- all Release dates for movie 1 to 250 sort will be
+	// verified
 	public static void sortByReleaseDate(String sortOrder) throws InterruptedException {
 
 		if (sortOrder == "ascending") {
@@ -277,6 +342,26 @@ public class SortByMetrics extends FetchMovieInformation {
 					SortBase.itr.previous();
 
 				}
+				switch (noOfItems) {
+				case 50:
+					System.out.println("Verified for 50 Elements");
+
+					break;
+				case 100:
+					System.out.println("Verified for 100 Elements");
+
+					break;
+				case 150:
+					System.out.println("Verified for 150 Elements");
+
+					break;
+				case 200:
+					System.out.println("Verified for 200 Elements");
+
+					break;
+				default:
+					System.out.println("Proceed");
+				}
 				noOfItems++;
 				SortBase.itr.previous();
 				SortBase.itr2.previous();
@@ -286,54 +371,38 @@ public class SortByMetrics extends FetchMovieInformation {
 	}
 
 	public static void main(String args[]) {
-
 		try {
 			SortBase.fetchDefaultSorting();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		launchIMDBTop250Page();
-		dropdown();
+			launchIMDBTop250Page();
+			dropdown();
 
-		createExcelSheet();
-		try {
+			createExcelSheet();
 			sortByRankings("ascending");
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		try {
 			sortByRankings("descending");
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		try {
 			storeReports("sortByRankings");
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+
+			createExcelSheet();
+			sortByReleaseDate("descending");
+			sortByReleaseDate("ascending");
+			storeReports("sortByReleaseDate");
+
+			createExcelSheet();
+			sortByIMDbRatings("descending");
+			sortByIMDbRatings("ascending");
+			storeReports("sortByIMDbRatings");
+
+			createExcelSheet();
+			sortByNoOfRatings("descending");
+			sortByNoOfRatings("ascending");
+			storeReports("sortByNoOfRatings");
+
+			System.out.println("Task Complete");
 		}
 
-		/*
-		 * createExcelSheet(); sortByReleaseDate("descending");
-		 * sortByReleaseDate("ascending"); storeReports("sortByReleaseDate");
-		 * 
-		 * createExcelSheet(); sortByIMDbRatings("descending");
-		 * sortByIMDbRatings("ascending"); storeReports("sortByIMDbRatings");
-		 * 
-		 * createExcelSheet(); sortByNoOfRatings("descending");
-		 * sortByNoOfRatings("ascending"); storeReports("sortByNoOfRatings");
-		 * 
-		 * System.out.println("Task Complete"); }
-		 */
-		try {
-		} catch (Exception e) {
+		catch (Exception e) {
 			System.out.print("Script Failed");
 			driver.quit();
 		}
 		driver.quit();
-		// }
 	}
 }

@@ -26,13 +26,14 @@ public class FetchMovieInformation extends CreateExcel {
 
 	public static String chromedriverpath = "resources/chromedriver/chromedriver.exe";
 
+	//launch chrome browser
 	public static WebDriver LaunchChrome() {
 		System.setProperty("webdriver.chrome.driver", chromedriverpath);
 		WebDriver driver = new ChromeDriver();
 		driver.manage().window().maximize();
 		return driver;
 	}
-
+	//functions to create and style excel
 	public static void createExcel() {
 
 		workbook = new HSSFWorkbook();
@@ -53,7 +54,8 @@ public class FetchMovieInformation extends CreateExcel {
 		setBorder(cell);
 		setColor(cell);
 	}
-
+	
+	//functions to write to excel
 	public static void writeExcel(String fetchName) throws IOException {
 		String fileName = fetchName;
 		String pathName = "D:/" + fileName + ".xls";
@@ -65,6 +67,7 @@ public class FetchMovieInformation extends CreateExcel {
 		System.out.println("Please go to the path " + pathName + " to see the fetched results");
 	}
 
+	//launch page 
 	public static void launchIMDBTop250Page() {
 		driver = LaunchChrome();
 		driver.get("https://www.imdb.com/");
@@ -82,7 +85,7 @@ public class FetchMovieInformation extends CreateExcel {
 		noOfItems = movieTable.findElements((By) Imdb_SortingPage_Locators.noOfMovies).size();
 
 	}
-
+	//store movie titles and write in excel
 	public static void storeMovieTitles() throws IOException {
 
 		List<WebElement> title = driver.findElements((By) Imdb_SortingPage_Locators.movieTableColumn);
@@ -106,7 +109,7 @@ public class FetchMovieInformation extends CreateExcel {
 		sheet.autoSizeColumn(0);
 
 	}
-
+	//store movie release and write in excel
 	public static void storeMovieRelease() throws IOException {
 		List<WebElement> releasedate = driver.findElements((By) Imdb_SortingPage_Locators.movieTableColumn);
 		Iterator<WebElement> itr = releasedate.iterator();
@@ -133,7 +136,7 @@ public class FetchMovieInformation extends CreateExcel {
 		}
 		sheet.autoSizeColumn(1);
 	}
-
+	//store movie ratings and write in excel
 	public static void storeMovieRatings() throws IOException {
 
 		List<WebElement> movieratings = driver.findElements((By) Imdb_SortingPage_Locators.moviePosterColumn);
