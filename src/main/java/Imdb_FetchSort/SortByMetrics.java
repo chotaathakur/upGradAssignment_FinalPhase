@@ -145,8 +145,7 @@ public class SortByMetrics extends FetchMovieInformation {
 				System.out.println("Verified for 200 Elements");
 
 				break;
-			default:
-				System.out.println("Proceed");
+
 			}
 			noOfItems++;
 			SortBase.itr.previous();
@@ -219,8 +218,7 @@ public class SortByMetrics extends FetchMovieInformation {
 						System.out.println("Verified for 200 Elements");
 
 						break;
-					default:
-						System.out.println("Proceed");
+
 					}
 				}
 				noOfItems++;
@@ -283,8 +281,7 @@ public class SortByMetrics extends FetchMovieInformation {
 					System.out.println("Verified for 200 Elements");
 
 					break;
-				default:
-					System.out.println("Proceed");
+
 				}
 				noOfItems++;
 				SortBase.itr.previous();
@@ -359,8 +356,7 @@ public class SortByMetrics extends FetchMovieInformation {
 					System.out.println("Verified for 200 Elements");
 
 					break;
-				default:
-					System.out.println("Proceed");
+
 				}
 				noOfItems++;
 				SortBase.itr.previous();
