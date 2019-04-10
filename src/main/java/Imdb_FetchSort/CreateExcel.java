@@ -1,4 +1,4 @@
-package upGradAssignment_Imdb_FetchSort;
+package Imdb_FetchSort;
 
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -14,9 +14,9 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 public class CreateExcel {
 
 	public static HSSFWorkbook workbook;
-	public static HSSFSheet sheet, sheet2;
-	public static HSSFRow rowhead, rowhead2;
-	public static HSSFCell cell, cell2;
+	public static HSSFSheet sheet, sheet2,sheet3;
+	public static HSSFRow rowhead, rowhead2,rowhead3;
+	public static HSSFCell cell, cell2,cell3;
 	public static CellStyle cellStyle;
 	
 

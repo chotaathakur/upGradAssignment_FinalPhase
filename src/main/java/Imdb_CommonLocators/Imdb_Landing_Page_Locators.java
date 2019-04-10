@@ -1,4 +1,4 @@
-package upGradAssignent_Imdb_CommonLocators;
+package Imdb_CommonLocators;
 
 import org.openqa.selenium.By;
 

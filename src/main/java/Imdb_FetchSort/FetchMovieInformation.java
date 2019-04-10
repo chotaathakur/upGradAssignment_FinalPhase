@@ -1,4 +1,4 @@
-package upGradAssignment_Imdb_FetchSort;
+package Imdb_FetchSort;
 
 import java.util.*;
 
@@ -11,8 +11,8 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import upGradAssignent_Imdb_CommonLocators.Imdb_Landing_Page_Locators;
-import upGradAssignent_Imdb_CommonLocators.Imdb_SortingPage_Locators;
+import Imdb_CommonLocators.Imdb_Landing_Page_Locators;
+import Imdb_CommonLocators.Imdb_SortingPage_Locators;
 
 import java.io.*;
 
@@ -22,17 +22,18 @@ public class FetchMovieInformation extends CreateExcel {
 
 	public static WebDriver driver;
 	public static WebElement movieTable;
-	public static int noOfItems;
+	public static int noOfItems,currentFetchedRank;
 
 	public static String chromedriverpath = "resources/chromedriver/chromedriver.exe";
 
+	//launch chrome browser
 	public static WebDriver LaunchChrome() {
 		System.setProperty("webdriver.chrome.driver", chromedriverpath);
 		WebDriver driver = new ChromeDriver();
 		driver.manage().window().maximize();
 		return driver;
 	}
-
+	//functions to create and style excel
 	public static void createExcel() {
 
 		workbook = new HSSFWorkbook();
@@ -53,7 +54,8 @@ public class FetchMovieInformation extends CreateExcel {
 		setBorder(cell);
 		setColor(cell);
 	}
-
+	
+	//functions to write to excel
 	public static void writeExcel(String fetchName) throws IOException {
 		String fileName = fetchName;
 		String pathName = "D:/" + fileName + ".xls";
@@ -65,6 +67,7 @@ public class FetchMovieInformation extends CreateExcel {
 		System.out.println("Please go to the path " + pathName + " to see the fetched results");
 	}
 
+	//launch page 
 	public static void launchIMDBTop250Page() {
 		driver = LaunchChrome();
 		driver.get("https://www.imdb.com/");
@@ -82,10 +85,10 @@ public class FetchMovieInformation extends CreateExcel {
 		noOfItems = movieTable.findElements((By) Imdb_SortingPage_Locators.noOfMovies).size();
 
 	}
-
+	//store movie titles and write in excel
 	public static void storeMovieTitles() throws IOException {
 
-		List<WebElement> title = driver.findElements((By) Imdb_SortingPage_Locators.movieTable);
+		List<WebElement> title = driver.findElements((By) Imdb_SortingPage_Locators.movieTableColumn);
 		Iterator<WebElement> itr = title.iterator();
 
 		noOfItems = 1;
@@ -106,9 +109,9 @@ public class FetchMovieInformation extends CreateExcel {
 		sheet.autoSizeColumn(0);
 
 	}
-
+	//store movie release and write in excel
 	public static void storeMovieRelease() throws IOException {
-		List<WebElement> releasedate = driver.findElements((By) Imdb_SortingPage_Locators.movieTable);
+		List<WebElement> releasedate = driver.findElements((By) Imdb_SortingPage_Locators.movieTableColumn);
 		Iterator<WebElement> itr = releasedate.iterator();
 
 		noOfItems = 1;
@@ -133,10 +136,10 @@ public class FetchMovieInformation extends CreateExcel {
 		}
 		sheet.autoSizeColumn(1);
 	}
-
+	//store movie ratings and write in excel
 	public static void storeMovieRatings() throws IOException {
 
-		List<WebElement> movieratings = driver.findElements((By) Imdb_SortingPage_Locators.movieRating);
+		List<WebElement> movieratings = driver.findElements((By) Imdb_SortingPage_Locators.moviePosterColumn);
 		Iterator<WebElement> itr = movieratings.iterator();
 
 		noOfItems = 1;
@@ -145,11 +148,12 @@ public class FetchMovieInformation extends CreateExcel {
 			if (sortIterator.isDisplayed()) {
 
 				String IMDbMovieRatings = sortIterator.findElement((By) Imdb_SortingPage_Locators.movieRatingFetch)
-						.getText();
-
+						.getAttribute("data-value");
+				double IMDbMovieRating=Float.parseFloat(IMDbMovieRatings);
+				IMDbMovieRating = SortBase.roundToOneDecimal(IMDbMovieRating);
 				rowhead = sheet.getRow((short) noOfItems);
 				cell = rowhead.createCell(2);
-				rowhead.getCell(2).setCellValue(IMDbMovieRatings);
+				rowhead.getCell(2).setCellValue(IMDbMovieRating);
 
 				noOfItems++;
 
